@@ -52,10 +52,9 @@ def get_model(num_classes=100):
     #######################
 
     # Get the pretrained ResNet18 model on ImageNet from torchvision.models
-    pass
+    
 
     # Randomly initialize and modify the model's last layer for CIFAR100.
-    pass
 
     #######################
     # END OF YOUR CODE    #
@@ -85,16 +84,52 @@ def train_model(model, lr, batch_size, epochs, data_dir, checkpoint_name, device
     #######################
 
     # Load the datasets
-    pass
+    train_set, val_set = get_train_validation_set(data_dir, augmentation_name=augmentation_name)
+    train_loader = data.DataLoader(train_set, batch_size=batch_size, shuffle=True)
+    val_loader = data.DataLoader(val_set, batch_size=batch_size, shuffle=False)
 
     # Initialize the optimizer (Adam) to train the last layer of the model.
-    pass
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
     # Training loop with validation after each epoch. Save the best model.
-    pass
+    best_val_accuracy = 0
+    for epoch in range(epochs):
+        # Set model to training mode
+        model.train()
+        # Loop over the training set and train the model.
+        for images, labels in train_loader:
+            # Move images and labels to the device.
+            images = images.to(device)
+            labels = labels.to(device)
+            # Zero the gradients.
+            optimizer.zero_grad()
+            # Forward pass.
+            outputs = model(images)
+            # Compute the loss.
+            loss = F.cross_entropy(outputs, labels)
+            # Backward pass.
+            loss.backward()
+            # Update the parameters.
+            optimizer.step()
 
+        # Set model to evaluation mode
+        model.eval()
+        # Loop over the validation set and compute the accuracy.
+        for images, labels in val_loader:
+            # Move images and labels to the device.
+            images = images.to(device)
+            labels = labels.to(device)
+            # Forward pass.
+            outputs = model(images)
+            # Compute the accuracy.
+            accuracy = torch.mean((torch.argmax(outputs, dim=1) == labels).float())
+            # Update the best validation accuracy and save the model if it is better.
+            if accuracy > best_val_accuracy:
+                best_val_accuracy = accuracy
+                torch.save(model.state_dict(), checkpoint_name)
     # Load the best model on val accuracy and return it.
-    pass
+    model.load_state_dict(torch.load(checkpoint_name))
+
 
     #######################
     # END OF YOUR CODE    #
@@ -119,12 +154,26 @@ def evaluate_model(model, data_loader, device):
     # PUT YOUR CODE HERE  #
     #######################
     # Set model to evaluation mode (Remember to set it back to training mode in the training loop)
-    pass
-
+    model.eval()
+ 
     # Loop over the dataset and compute the accuracy. Return the accuracy
     # Remember to use torch.no_grad().
-    pass
+    correct_predictions = 0
+    count = 0
 
+    for images, labels in data_loader:
+        # Move images and labels to the device.
+        images = images.to(device)
+        labels = labels.to(device)
+
+        with torch.no_grad():
+            outputs = model(images)
+            correct_predictions += torch.sum(torch.argmax(outputs, dim=1) == labels)
+            count += len(labels)
+
+    accuracy = correct_predictions / count
+    print(f"Accuracy: {accuracy}")
+ 
     #######################
     # END OF YOUR CODE    #
     #######################
@@ -148,23 +197,24 @@ def main(lr, batch_size, epochs, data_dir, seed, augmentation_name, test_noise):
     # PUT YOUR CODE HERE  #
     #######################
     # Set the seed for reproducibility
-    pass
-
+    set_seed(seed)
     # Set the device to use for training
-    pass
-
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+ 
     # Load the model
-    pass
-
+    model = get_model()
+ 
     # Get the augmentation to use
-    pass
-
+    augmentation_name = augmentation_name if augmentation_name is not None else 'None'
+ 
     # Train the model
-    pass
-
+    model = train_model(model, lr, batch_size, epochs, data_dir, augmentation_name, device)
+ 
     # Evaluate the model on the test set
-    pass
-
+    test_set = get_test_set(data_dir)
+    test_loader = data.DataLoader(test_set, batch_size=batch_size, shuffle=True)
+    accuracy = evaluate_model(model, test_loader, device)
+ 
     #######################
     # END OF YOUR CODE    #
     #######################
