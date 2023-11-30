@@ -36,7 +36,6 @@ def add_augmentation(augmentation_name, transform_list):
     # Create a new transformation based on the augmentation_name.
     if augmentation_name == "Crop_augmentation": 
         train_transform = transforms.FiveCrop(size=(100, 100))
-         
         transform_list.append(train_transform)
     elif augmentation_name == 'Affinetransform':
         affine_transfomer = transforms.RandomAffine(degrees=(30, 70), translate=(0.1, 0.3), scale=(0.5, 0.75))
