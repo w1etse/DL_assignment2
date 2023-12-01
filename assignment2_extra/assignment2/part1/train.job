@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH --partition=gpu_shared_course
+#SBATCH --partition=gpu
 #SBATCH --gpus=1
-#SBATCH --job-name=runtrain.job
+#SBATCH --job-name=RunPart1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=18
-#SBATCH --time=00:30:00
+#SBATCH --time=00:05:00
 #SBATCH --output=slurm_output_%A.out
 
 module purge
