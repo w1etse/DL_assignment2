@@ -10,3 +10,5 @@
 #SBATCH --output=slurm_output_%A.out
 
 
+
+cd $HOME/DL_assignment2/

@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --partition=gpu_shared_course
-#SBATCH --gpu:1
-#SBATCH --job-name=Augment
+#SBATCH --partition=gpu
+#SBATCH --gpus=1
+#SBATCH --job-name=RunPart1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=18
 #SBATCH --time=00:30:00
@@ -14,6 +14,8 @@ module load Anaconda3/2022.05
 
 # activate the environment
 source activate dl2023
+
+cd $HOME/DL_assignment2/
 
 # Run 1: Zero-shot CLIP on CIFAR-10 with standard text prompt
 
